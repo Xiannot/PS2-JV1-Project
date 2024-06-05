@@ -59,7 +59,20 @@ public class Mouvement : MonoBehaviour
     }
 
 
+
     void Update()
+    {
+        if (jumpValue > 0)
+        {
+            rb.sharedMaterial = bounceMat;
+        }
+        else
+        {
+            rb.sharedMaterial = normalMat;
+        }
+    }
+
+    void FixedUpdate()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
 
@@ -73,21 +86,14 @@ public class Mouvement : MonoBehaviour
         animator.SetFloat("Vertical", movement.y);
         animator.SetFloat("Magnitude", movement.magnitude);
 
-        isGrounded = Physics2D.OverlapBox(new Vector2(gameObject.transform.position.x, gameObject.transform.position.y - 3f),
+        isGrounded = Physics2D.OverlapBox(new Vector2(gameObject.transform.position.x, gameObject.transform.position.y - 0.9f),
         new Vector2(3f, 0.4f), 0f, groundMask);
 
-        if (jumpValue > 0)
-        {
-            rb.sharedMaterial = bounceMat;
-        }
-        else
-        {
-            rb.sharedMaterial = normalMat;
-        }
+        
 
         if (Input.GetKey("space") && isGrounded && canJump)
         {
-            jumpValue += 0.2f;
+            jumpValue += 0.4f;
             jumpScript.SetJump(jumpValue);
             animator.SetBool("Space", true);
 
@@ -103,7 +109,7 @@ public class Mouvement : MonoBehaviour
             float tempx = moveInput * walkSpeed;
             float tempy = jumpValue;
             rb.velocity = new Vector2(tempx, tempy);
-            Invoke("ResetJump", 0.2f);
+            Invoke("ResetJump", 0.1f);
             animator.SetBool("Space", false);
         }
 
@@ -118,22 +124,7 @@ public class Mouvement : MonoBehaviour
             }
             canJump = true;
         }
-    }
 
-    void ResetJump()
-    {
-        canJump = false;
-        jumpValue = 0;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawCube(new Vector2(gameObject.transform.position.x, gameObject.transform.position.y - 1f), new Vector2(3f, 0.6f));
-    }
-
-    void FixedUpdate()
-    {
         if (KBCounter <= 0)
         {
             
@@ -152,6 +143,39 @@ public class Mouvement : MonoBehaviour
             KBCounter -= Time.deltaTime;
         }
     }
+
+    void ResetJump()
+    {
+        canJump = false;
+        jumpValue = 0;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawCube(new Vector2(gameObject.transform.position.x, gameObject.transform.position.y - 0.9f), new Vector2(3f, 0.6f));
+    }
+
+    //void FixedUpdate()
+   // {
+    //    if (KBCounter <= 0)
+    //    {
+            
+   //     }
+    //    else
+   //     {
+      //      if (KnockFromRight == true)
+      //      {
+       //         rb.velocity = new Vector2(-KBForce, KBForce);
+       //     }
+        //    if (KnockFromRight == false)
+        //    {
+          //      rb.velocity = new Vector2(KBForce, KBForce);
+          //  }
+
+          //  KBCounter -= Time.deltaTime;
+        //}
+  //  }
 
 
 }

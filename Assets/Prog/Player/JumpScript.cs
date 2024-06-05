@@ -21,7 +21,7 @@ public class JumpScript : MonoBehaviour
     }
     public void SetJump(float jump)
     {
-        Debug.Log(jump);
+        
         slider.SetValueWithoutNotify(jump);
 
     }
