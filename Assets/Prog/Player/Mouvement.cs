@@ -2,9 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Rewired;
 
 public class Mouvement : MonoBehaviour
 {
+
+    public AudioSource source;
+    public AudioClip clip;
+
+
+    public int playerId = 0;
+    private Player player;
+
     public float walkSpeed;
     private float moveInput;
     public bool isGrounded;
@@ -30,6 +39,11 @@ public class Mouvement : MonoBehaviour
     Vector3 movement;
 
 
+
+    void Awake()
+    {
+        player = ReInput.players.GetPlayer(playerId);
+    }
 
 
     void Start()
@@ -62,6 +76,10 @@ public class Mouvement : MonoBehaviour
 
     void Update()
     {
+
+        moveInput = player.GetAxisRaw("Horizontal");
+
+
         if (jumpValue > 0)
         {
             rb.sharedMaterial = bounceMat;
@@ -70,17 +88,50 @@ public class Mouvement : MonoBehaviour
         {
             rb.sharedMaterial = normalMat;
         }
+
+
+        if (player.GetButtonDown("space") && isGrounded && canJump)
+        {
+            rb.velocity = new Vector2(0.0f, rb.velocity.y);
+            
+        }
+
+
+        if (player.GetButtonUp("space"))
+        {
+            source.PlayOneShot(clip);
+            if (isGrounded)
+            {
+                rb.velocity = new Vector2(moveInput * walkSpeed, jumpValue);
+                jumpValue = 0.0f;
+                jumpScript.SetJump(jumpValue);
+                animator.SetBool("Space", false);
+            }
+            canJump = true;
+        }
+
+        if (player.GetButtonDown("space") && isGrounded && canJump)
+        {
+            rb.velocity = new Vector2(0.0f, rb.velocity.y);   
+        }
+
+        if (player.GetButton("space") && isGrounded && canJump)
+        {
+            
+            jumpScript.SetJump(jumpValue);
+            animator.SetBool("Space", true);
+
+        }
+
+        if (jumpValue == 0.0f && isGrounded)
+        {
+            movement = rb.velocity = new Vector2(moveInput * walkSpeed, rb.velocity.y);
+
+        }
     }
 
     void FixedUpdate()
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
-
-        if (jumpValue == 0.0f && isGrounded)
-        {
-           movement = rb.velocity = new Vector2(moveInput * walkSpeed, rb.velocity.y);
-            
-        }
 
         animator.SetFloat("Horizontal", movement.x);
         animator.SetFloat("Vertical", movement.y);
@@ -91,20 +142,17 @@ public class Mouvement : MonoBehaviour
 
         
 
-        if (Input.GetKey("space") && isGrounded && canJump)
+        if (player.GetButton("space") && isGrounded && canJump)
         {
-            jumpValue += 0.4f;
+            jumpValue += 0.4f;  
             jumpScript.SetJump(jumpValue);
             animator.SetBool("Space", true);
 
         }
 
-        if (Input.GetKeyDown("space") && isGrounded && canJump)
-        {
-            rb.velocity = new Vector2(0.0f, rb.velocity.y);
-        }
 
-        if (jumpValue >= 40f && isGrounded)
+
+        if (jumpValue >= 25f && isGrounded)
         {
             float tempx = moveInput * walkSpeed;
             float tempy = jumpValue;
@@ -113,17 +161,7 @@ public class Mouvement : MonoBehaviour
             animator.SetBool("Space", false);
         }
 
-        if (Input.GetKeyUp("space"))
-        {
-            if (isGrounded)
-            {
-                rb.velocity = new Vector2(moveInput * walkSpeed, jumpValue);
-                jumpValue = 0.0f;
-                jumpScript.SetJump(jumpValue);
-                animator.SetBool("Space", false);
-            }
-            canJump = true;
-        }
+        
 
         if (KBCounter <= 0)
         {

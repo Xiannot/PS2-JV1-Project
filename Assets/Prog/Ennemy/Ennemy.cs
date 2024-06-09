@@ -13,6 +13,8 @@ public class Ennemy : MonoBehaviour
 
     public Animator animator;
 
+    
+
 
 
 
@@ -54,7 +56,12 @@ public class Ennemy : MonoBehaviour
                 playerMouvement.KnockFromRight = false;
             }
 
+            SpriteRenderer spriterd = gameObject.GetComponent<SpriteRenderer>();
+            spriterd.sortingOrder = 4;
+
         }
+
+        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
